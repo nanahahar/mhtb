@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Arsitektur Pengelolaan Hutan Lestari</title>
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --forest:    #1e4a2b;
+      --moss:      #3a6b47;
+      --fern:      #5a8a5e;
+      --sage:      #8db896;
+      --mist:      #d6e8d9;
+      --cream:     #f4f0e6;
+      --soil:      #7a5c3a;
+      --sand:      #c4a97a;
+      --charcoal:  #2a2a2a;
+      --ink:       #3d3d3d;
+      --soft:      #6b7c72;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background-color: var(--cream);
+      color: var(--ink);
+      font-family: 'Inter', sans-serif;
+      font-size: 17px;
+      line-height: 1.75;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── TOPOGRAPHY BACKGROUND ─────────────────────── */
+    .topo-bg {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='800'%3E%3Cg fill='none' stroke='%233a6b47' stroke-width='0.8' opacity='0.12'%3E%3Cellipse cx='400' cy='400' rx='380' ry='200'/%3E%3Cellipse cx='400' cy='400' rx='320' ry='160'/%3E%3Cellipse cx='400' cy='400' rx='260' ry='120'/%3E%3Cellipse cx='400' cy='400' rx='200' ry='85'/%3E%3Cellipse cx='400' cy='400' rx='140' ry='55'/%3E%3Cellipse cx='400' cy='400' rx='80' ry='30'/%3E%3Cellipse cx='200' cy='600' rx='180' ry='120'/%3E%3Cellipse cx='200' cy='600' rx='130' ry='85'/%3E%3Cellipse cx='200' cy='600' rx='80' ry='55'/%3E%3Cellipse cx='600' cy='200' rx='160' ry='100'/%3E%3Cellipse cx='600' cy='200' rx='110' ry='68'/%3E%3Cellipse cx='600' cy='200' rx='65' ry='42'/%3E%3C/g%3E%3C/svg%3E");
+      background-size: 700px 700px;
+    }
+
+    /* ── HERO ──────────────────────────────────────── */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 80px 40px 60px;
+      position: relative;
+      overflow: hidden;
+      background-color: var(--forest);
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1200' height='1200'%3E%3Cg fill='none' stroke='%235a8a5e' stroke-width='1' opacity='0.15'%3E%3Cellipse cx='600' cy='600' rx='560' ry='340'/%3E%3Cellipse cx='600' cy='600' rx='480' ry='280'/%3E%3Cellipse cx='600' cy='600' rx='400' ry='220'/%3E%3Cellipse cx='600' cy='600' rx='320' ry='160'/%3E%3Cellipse cx='600' cy='600' rx='240' ry='110'/%3E%3Cellipse cx='600' cy='600' rx='160' ry='70'/%3E%3Cellipse cx='600' cy='600' rx='80' ry='35'/%3E%3Cellipse cx='150' cy='900' rx='300' ry='180'/%3E%3Cellipse cx='150' cy='900' rx='220' ry='130'/%3E%3Cellipse cx='150' cy='900' rx='140' ry='85'/%3E%3Cellipse cx='1050' cy='200' rx='250' ry='150'/%3E%3Cellipse cx='1050' cy='200' rx='180' ry='105'/%3E%3Cellipse cx='1050' cy='200' rx='110' ry='65'/%3E%3C/g%3E%3C/svg%3E");
+      background-size: cover;
+      pointer-events: none;
+    }
+
+    .hero-eyebrow {
+      font-family: 'Inter', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--sage);
+      margin-bottom: 24px;
+      position: relative;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .hero-eyebrow::before {
+      content: '';
+      display: inline-block; width: 32px; height: 1px;
+      background: var(--sage);
+    }
+
+    .hero h1 {
+      font-family: 'Lora', serif;
+      font-size: clamp(2.4rem, 5vw, 4.2rem);
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.18;
+      max-width: 820px;
+      position: relative;
+      margin-bottom: 28px;
+    }
+
+    .hero h1 em {
+      font-style: italic;
+      color: var(--sage);
+    }
+
+    .hero-lead {
+      font-size: 1.05rem;
+      color: rgba(255,255,255,0.65);
+      max-width: 560px;
+      position: relative;
+      margin-bottom: 48px;
+      line-height: 1.7;
+    }
+
+    .hero-meta {
+      display: flex; align-items: center; gap: 20px;
+      position: relative;
+    }
+
+    .hero-leaf {
+      width: 36px; height: 36px;
+      background: var(--moss);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+    }
+
+    .hero-meta-text {
+      font-size: 13px;
+      color: rgba(255,255,255,0.5);
+      line-height: 1.5;
+    }
+    .hero-meta-text strong { color: rgba(255,255,255,0.8); font-weight: 500; }
+
+    .scroll-hint {
+      position: absolute; bottom: 32px; left: 50%; transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      color: rgba(255,255,255,0.3);
+      font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase;
+    }
+    .scroll-hint-line {
+      width: 1px; height: 40px;
+      background: linear-gradient(to bottom, rgba(255,255,255,0.3), transparent);
+      animation: scrollPulse 2s ease-in-out infinite;
+    }
+    @keyframes scrollPulse { 0%,100%{opacity:.3} 50%{opacity:.8} }
+
+    /* ── LAYOUT ─────────────────────────────────────── */
+    .container {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    .container-wide {
+      max-width: 1060px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* ── ARTICLE SECTIONS ───────────────────────────── */
+    .section {
+      padding: 72px 0;
+    }
+
+    .section + .section {
+      border-top: 1px solid rgba(58, 107, 71, 0.12);
+    }
+
+    .section-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--fern);
+      margin-bottom: 16px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .section-label::after {
+      content: '';
+      flex: 1; max-width: 40px; height: 1px;
+      background: var(--fern); opacity: 0.5;
+    }
+
+    h2 {
+      font-family: 'Lora', serif;
+      font-size: clamp(1.7rem, 3vw, 2.5rem);
+      font-weight: 700;
+      color: var(--forest);
+      line-height: 1.25;
+      margin-bottom: 20px;
+    }
+
+    h3 {
+      font-family: 'Lora', serif;
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--forest);
+      line-height: 1.3;
+      margin-bottom: 10px;
+    }
+
+    p {
+      color: var(--ink);
+      margin-bottom: 18px;
+      font-size: 1rem;
+    }
+
+    p:last-child { margin-bottom: 0; }
+
+    strong { font-weight: 600; color: var(--charcoal); }
+    em { font-style: italic; color: var(--soft); }
+
+    /* ── PULLQUOTE ──────────────────────────────────── */
+    .pullquote {
+      border-left: 3px solid var(--moss);
+      padding: 24px 32px;
+      margin: 40px 0;
+      background: rgba(58, 107, 71, 0.05);
+      border-radius: 0 8px 8px 0;
+    }
+
+    .pullquote p {
+      font-family: 'Lora', serif;
+      font-size: 1.2rem;
+      font-style: italic;
+      color: var(--forest);
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    /* ── COMPARISON TABLE ───────────────────────────── */
+    .compare-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin: 32px 0;
+    }
+
+    .compare-card {
+      border-radius: 12px;
+      padding: 28px 24px;
+    }
+
+    .compare-card.past {
+      background: rgba(196, 169, 122, 0.12);
+      border: 1px solid rgba(196, 169, 122, 0.3);
+    }
+
+    .compare-card.future {
+      background: rgba(58, 107, 71, 0.08);
+      border: 1px solid rgba(58, 107, 71, 0.25);
+    }
+
+    .compare-label {
+      font-size: 11px; font-weight: 600;
+      letter-spacing: 0.15em; text-transform: uppercase;
+      margin-bottom: 16px;
+      padding: 4px 10px;
+      border-radius: 4px;
+      display: inline-block;
+    }
+
+    .compare-card.past .compare-label {
+      background: rgba(122, 92, 58, 0.15);
+      color: var(--soil);
+    }
+
+    .compare-card.future .compare-label {
+      background: rgba(30, 74, 43, 0.12);
+      color: var(--moss);
+    }
+
+    .compare-row {
+      margin-bottom: 16px;
+    }
+
+    .compare-row h4 {
+      font-size: 12px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.1em;
+      margin-bottom: 4px;
+      opacity: 0.7;
+    }
+
+    .compare-row p {
+      font-size: 0.92rem;
+      margin: 0;
+      line-height: 1.55;
+    }
+
+    /* ── PILLAR CARDS ───────────────────────────────── */
+    .pillar-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin: 32px 0;
+    }
+
+    .pillar-card {
+      background: #fff;
+      border: 1px solid rgba(58,107,71,0.15);
+      border-radius: 12px;
+      padding: 24px 20px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .pillar-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 32px rgba(30,74,43,0.1);
+    }
+
+    .pillar-icon {
+      width: 44px; height: 44px;
+      background: var(--mist);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+      margin-bottom: 14px;
+    }
+
+    .pillar-card h3 {
+      font-size: 1rem;
+      margin-bottom: 6px;
+    }
+
+    .pillar-card p {
+      font-size: 0.88rem;
+      color: var(--soft);
+      margin: 0;
+      line-height: 1.55;
+    }
+
+    /* ── PADIATAPA CYCLE ────────────────────────────── */
+    .cycle-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin: 32px 0;
+    }
+
+    .cycle-item {
+      display: flex; gap: 14px; align-items: flex-start;
+      padding: 20px;
+      background: #fff;
+      border-radius: 10px;
+      border: 1px solid rgba(58,107,71,0.12);
+    }
+
+    .cycle-num {
+      width: 32px; height: 32px;
+      min-width: 32px;
+      background: var(--forest);
+      color: #fff;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 600;
+    }
+
+    .cycle-item h3 { font-size: 0.95rem; margin-bottom: 4px; }
+    .cycle-item p { font-size: 0.86rem; color: var(--soft); margin: 0; }
+
+    /* ── TECH CARDS ──────────────────────────────────── */
+    .tech-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin: 32px 0;
+    }
+
+    .tech-card {
+      background: var(--forest);
+      color: #fff;
+      border-radius: 12px;
+      padding: 24px 20px;
+    }
+
+    .tech-card-icon { font-size: 28px; margin-bottom: 12px; }
+    .tech-card h3 { color: var(--sage); font-size: 1rem; margin-bottom: 8px; }
+    .tech-card p { font-size: 0.88rem; color: rgba(255,255,255,0.65); margin: 0; line-height: 1.55; }
+
+    /* ── FOREST CHAIN ───────────────────────────────── */
+    .chain {
+      display: flex; gap: 0;
+      margin: 32px 0;
+      overflow-x: auto;
+      padding-bottom: 8px;
+    }
+
+    .chain-item {
+      flex: 1; min-width: 160px;
+      background: #fff;
+      border: 1px solid rgba(58,107,71,0.2);
+      border-right: none;
+      padding: 24px 20px;
+      position: relative;
+    }
+
+    .chain-item:first-child { border-radius: 10px 0 0 10px; }
+    .chain-item:last-child { border-radius: 0 10px 10px 0; border-right: 1px solid rgba(58,107,71,0.2); }
+
+    .chain-item::after {
+      content: '→';
+      position: absolute; right: -12px; top: 50%; transform: translateY(-50%);
+      color: var(--fern); font-size: 16px; z-index: 1;
+    }
+    .chain-item:last-child::after { display: none; }
+
+    .chain-item-num {
+      font-size: 11px; font-weight: 600;
+      color: var(--fern); letter-spacing: 0.12em;
+      margin-bottom: 8px;
+    }
+    .chain-item h3 { font-size: 0.95rem; margin-bottom: 6px; }
+    .chain-item p { font-size: 0.83rem; color: var(--soft); margin: 0; }
+
+    /* ── MULTI-USE GRID ─────────────────────────────── */
+    .multiuse-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+      margin: 32px 0;
+    }
+
+    .multiuse-item {
+      padding: 20px 18px;
+      border-radius: 10px;
+      border: 1px solid rgba(58,107,71,0.15);
+      background: rgba(214, 232, 217, 0.2);
+    }
+
+    .multiuse-item-icon { font-size: 22px; margin-bottom: 10px; }
+    .multiuse-item h3 { font-size: 0.95rem; margin-bottom: 4px; }
+    .multiuse-item p { font-size: 0.85rem; color: var(--soft); margin: 0; }
+
+    /* ── CLOSING MANIFESTO ──────────────────────────── */
+    .manifesto {
+      background: var(--forest);
+      padding: 80px 40px;
+      text-align: center;
+    }
+
+    .manifesto .section-label { justify-content: center; color: var(--sage); }
+    .manifesto .section-label::after { display: none; }
+    .manifesto .section-label::before {
+      content: ''; width: 32px; height: 1px;
+      background: var(--sage); opacity: 0.5;
+    }
+
+    .manifesto-lines {
+      margin: 40px auto;
+      max-width: 640px;
+      display: flex; flex-direction: column; gap: 16px;
+    }
+
+    .manifesto-line {
+      font-family: 'Lora', serif;
+      font-size: clamp(1.4rem, 3.5vw, 2.1rem);
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.2;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .manifesto-line.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .manifesto-line .tag {
+      display: inline-block;
+      background: rgba(141,184,150,0.2);
+      border: 1px solid rgba(141,184,150,0.4);
+      color: var(--sage);
+      font-size: 0.55em; font-weight: 600;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      padding: 3px 8px; border-radius: 4px;
+      vertical-align: middle; margin-right: 10px;
+    }
+
+    .manifesto p {
+      color: rgba(255,255,255,0.5);
+      font-size: 0.95rem;
+      max-width: 520px;
+      margin: 0 auto;
+      line-height: 1.7;
+    }
+
+    /* ── WARNING BOX ───────────────────────────────── */
+    .warning-box {
+      background: rgba(122,92,58,0.08);
+      border: 1px solid rgba(122,92,58,0.25);
+      border-radius: 10px;
+      padding: 20px 24px;
+      margin: 28px 0;
+      display: flex; gap: 14px; align-items: flex-start;
+    }
+    .warning-icon { font-size: 20px; margin-top: 2px; }
+    .warning-box p { font-size: 0.93rem; color: var(--soil); margin: 0; line-height: 1.6; }
+
+    /* ── NAV ───────────────────────────────────────── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 16px 32px;
+      display: flex; justify-content: space-between; align-items: center;
+      transition: background 0.3s ease, backdrop-filter 0.3s ease;
+    }
+
+    nav.scrolled {
+      background: rgba(244,240,230,0.92);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(58,107,71,0.12);
+    }
+
+    .nav-logo {
+      font-family: 'Lora', serif;
+      font-size: 15px; font-weight: 600;
+      color: #fff;
+      transition: color 0.3s;
+    }
+    nav.scrolled .nav-logo { color: var(--forest); }
+
+    .nav-links {
+      display: flex; gap: 28px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-size: 13px; font-weight: 500;
+      color: rgba(255,255,255,0.7);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    nav.scrolled .nav-links a { color: var(--soft); }
+    .nav-links a:hover { color: #fff; }
+    nav.scrolled .nav-links a:hover { color: var(--forest); }
+
+    /* ── DIVIDER TREE ───────────────────────────────── */
+    .divider-tree {
+      text-align: center;
+      padding: 24px 0;
+      font-size: 20px;
+      opacity: 0.3;
+    }
+
+    /* ── RESPONSIVE ─────────────────────────────────── */
+    @media (max-width: 700px) {
+      .compare-grid { grid-template-columns: 1fr; }
+      .tech-grid { grid-template-columns: 1fr; }
+      .cycle-grid { grid-template-columns: 1fr; }
+      .chain { flex-direction: column; }
+      .chain-item { border-right: 1px solid rgba(58,107,71,0.2); border-bottom: none; border-radius: 0; }
+      .chain-item:first-child { border-radius: 10px 10px 0 0; }
+      .chain-item:last-child { border-radius: 0 0 10px 10px; border-bottom: 1px solid rgba(58,107,71,0.2); }
+      .chain-item::after { content: '↓'; right: auto; left: 50%; top: auto; bottom: -14px; transform: translateX(-50%); }
+      nav { padding: 14px 20px; }
+      .nav-links { display: none; }
+      .hero { padding: 100px 24px 60px; }
+      .manifesto { padding: 60px 24px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .manifesto-line { transition: none; }
+      .scroll-hint-line { animation: none; }
+      .pillar-card:hover { transform: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav id="mainNav">
+    <span class="nav-logo">🌿 Hutan Lestari</span>
+    <ul class="nav-links">
+      <li><a href="#paradigma">Paradigma</a></li>
+      <li><a href="#pilar">Lima Pilar</a></li>
+      <li><a href="#lapangan">Lapangan</a></li>
+      <li><a href="#teknologi">Teknologi</a></li>
+      <li><a href="#multiusaha">Multi-usaha</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <header class="hero topo-bg">
+    <div class="container">
+      <div class="hero-eyebrow">Bahan Kuliah · Manajemen Hutan</div>
+      <h1>Arsitektur <em>Manajerial-Kepatuhan</em> Pengelolaan Hutan Lestari</h1>
+      <p class="hero-lead">Tidak ada satu pohon pun yang ditebang atau dihitung karbonnya tanpa verifikasi absolut — sebuah cetak biru integrasi hukum, data spasial, dan teknologi.</p>
+      <div class="hero-meta">
+        <div class="hero-leaf">🌳</div>
+        <div class="hero-meta-text">
+          <strong>Pengelolaan Hutan Berkelanjutan</strong><br>
+          Ekologi · Hukum · Teknologi Digital
+        </div>
+      </div>
+    </div>
+    <div class="scroll-hint">
+      <div class="scroll-hint-line"></div>
+      Gulir
+    </div>
+  </header>
+
+  <!-- SECTION 1: PARADIGMA -->
+  <section class="section" id="paradigma">
+    <div class="container">
+      <div class="section-label">01 · Pergeseran Paradigma</div>
+      <h2>Dari Eksploitasi Menuju Kepatuhan Terstruktur</h2>
+      <p>Dunia kehutanan sedang mengalami transformasi mendasar. Pendekatan lama yang mengejar volume panen maksimal dalam jangka pendek kini terbukti tidak hanya merusak ekosistem, tetapi juga membuka risiko hukum dan bisnis yang serius.</p>
+      <p>Kegagalan bertransisi dari paradigma lama berisiko pada <strong>pencabutan sertifikasi keberlanjutan</strong>, hilangnya akses pasar global, dan sanksi hukum berat yang dapat mematikan operasi sepenuhnya.</p>
+
+      <div class="compare-grid">
+        <div class="compare-card past">
+          <span class="compare-label">⚠ Masa Lalu — Eksploitatif</span>
+          <div class="compare-row">
+            <h4>Paradigma Utama</h4>
+            <p>Berorientasi pada pemanenan jangka pendek dan volume maksimal, tanpa mempertimbangkan daya dukung ekosistem.</p>
+          </div>
+          <div class="compare-row">
+            <h4>Standar Operasional</h4>
+            <p>Panduan kasat mata, rawan <em>human error</em> dan manipulasi data di lapangan.</p>
+          </div>
+          <div class="compare-row">
+            <h4>Validasi</h4>
+            <p>Tertutup <em>(opaque)</em> dan lambat — penyimpangan baru diketahui setelah kerusakan meluas.</p>
+          </div>
+        </div>
+        <div class="compare-card future">
+          <span class="compare-label">✓ Masa Depan — Manajerial</span>
+          <div class="compare-row">
+            <h4>Paradigma Utama</h4>
+            <p>Integritas ekonomi dipertahankan <em>melalui</em> integritas ekologi. Kerusakan minimal adalah prasyarat bisnis.</p>
+          </div>
+          <div class="compare-row">
+            <h4>Standar Operasional</h4>
+            <p>Disiplin manajerial kaku, dikendalikan hierarki perencanaan mutlak berbasis dokumen resmi.</p>
+          </div>
+          <div class="compare-row">
+            <h4>Validasi</h4>
+            <p>Transparansi digital <em>real-time</em> yang dapat dibuktikan <em>(verifiable)</em> oleh pihak ketiga manapun.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 2: RPJP & RPKH -->
+  <section class="section">
+    <div class="container">
+      <div class="section-label">02 · Hierarki Perencanaan</div>
+      <h2>RPJP dan RPKH sebagai Konstitusi Operasional Mutlak</h2>
+      <p>Setiap aktivitas di hutan produksi harus mengakar pada dua dokumen yang membentuk hierarki perencanaan yang tidak bisa dilanggar. Keduanya bukan sekadar panduan — melainkan konstitusi operasional yang mengikat secara hukum.</p>
+
+      <div class="pillar-grid" style="grid-template-columns: 1fr;">
+        <div class="pillar-card" style="border-left: 3px solid var(--moss);">
+          <div style="display:flex; gap:16px; align-items:flex-start;">
+            <div class="pillar-icon">🗺</div>
+            <div>
+              <span class="section-label" style="margin:0 0 6px;">Payung Strategis</span>
+              <h3>RPJP — Rencana Pengaturan Jangka Panjang</h3>
+              <p>Visi multi-dekade dan arah kebijakan makro. Menetapkan batas-batas strategis yang menjadi acuan semua keputusan turunan di bawahnya.</p>
+            </div>
+          </div>
+        </div>
+        <div class="pillar-card" style="border-left: 3px solid var(--fern);">
+          <div style="display:flex; gap:16px; align-items:flex-start;">
+            <div class="pillar-icon">📋</div>
+            <div>
+              <span class="section-label" style="margin:0 0 6px;">Kitab Suci Operasional</span>
+              <h3>RPKH — Rencana Pengaturan Kelestarian Hasil</h3>
+              <p>Penjabaran teknis tahunan. Satu-satunya rujukan operasional mutlak di lapangan. Setiap angka tebangan, jalur sarad, dan blok produksi ditentukan di sini.</p>
+            </div>
+          </div>
+        </div>
+        <div class="pillar-card" style="border-left: 3px solid var(--sand);">
+          <div style="display:flex; gap:16px; align-items:flex-start;">
+            <div class="pillar-icon">📍</div>
+            <div>
+              <span class="section-label" style="margin:0 0 6px;">Rigiditas Spasial</span>
+              <h3>Eksekusi Lapangan — Kepatuhan Spasial</h3>
+              <p>Dilarang keras beraktivitas di luar batas petak RPH. <strong>Pelanggaran batas adalah tindakan ilegal</strong> <em>(in-procedural)</em> yang membatalkan seluruh legalitas operasi.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 3: LIMA PILAR -->
+  <section class="section" id="pilar" style="background: rgba(214,232,217,0.2);">
+    <div class="container">
+      <div class="section-label">03 · Fondasi Sistem</div>
+      <h2>Lima Pilar Ekosistem Pengelolaan Hutan Lestari</h2>
+      <p>Implementasi berdiri di atas lima pilar yang saling mengunci. <strong>Kelemahan pada satu pilar akan meruntuhkan seluruh struktur kepatuhan</strong> — tidak ada yang bisa dikompromikan.</p>
+
+      <div class="pillar-grid">
+        <div class="pillar-card">
+          <div class="pillar-icon">🗺️</div>
+          <h3>Penataan Ruang</h3>
+          <p>Peta blok dan batas petak fungsional mutlak. Fondasi spasial seluruh operasi.</p>
+        </div>
+        <div class="pillar-card">
+          <div class="pillar-icon">🌳</div>
+          <h3>Potensi Isi Ruang</h3>
+          <p>Database pohon dengan identitas digital: Species ID, DBH, dan Volume per individu.</p>
+        </div>
+        <div class="pillar-card">
+          <div class="pillar-icon">👷</div>
+          <h3>Pengelada</h3>
+          <p>Eksekutor profesional bersertifikasi berbasis data <em>real-time</em> di lapangan.</p>
+        </div>
+        <div class="pillar-card">
+          <div class="pillar-icon">🛰️</div>
+          <h3>Sistem Informasi</h3>
+          <p>Pengawasan digital via satelit dan drone. Verifikasi objektif tanpa bias manusia.</p>
+        </div>
+        <div class="pillar-card">
+          <div class="pillar-icon">🤝</div>
+          <h3>Sistem Pendukung</h3>
+          <p>Mekanisme PADIATAPA dan benteng legalitas hukum melalui perjanjian formal.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 4: DNA OPERASIONAL -->
+  <section class="section">
+    <div class="container">
+      <div class="section-label">04 · Data Pohon</div>
+      <h2>DNA Operasional: Setiap Pohon adalah Aset Digital</h2>
+      <p>Transformasi fundamental terjadi ketika hutan fisik diubah menjadi aset digital yang terukur. Setiap pohon yang layak tebang harus memiliki identitas data lengkap sebelum gergaji menyentuhnya.</p>
+
+      <div class="compare-grid">
+        <div class="compare-card" style="background: rgba(58,107,71,0.05); border-color: rgba(58,107,71,0.2);">
+          <div style="font-size: 11px; font-weight: 600; letter-spacing: .15em; text-transform: uppercase; color: var(--fern); margin-bottom: 16px;">📍 Species ID</div>
+          <p style="font-size:.92rem; margin:0;">Identifikasi botani untuk status perlindungan CITES/IUCN. Menentukan apakah pohon boleh ditebang secara hukum internasional.</p>
+        </div>
+        <div class="compare-card" style="background: rgba(58,107,71,0.05); border-color: rgba(58,107,71,0.2);">
+          <div style="font-size: 11px; font-weight: 600; letter-spacing: .15em; text-transform: uppercase; color: var(--fern); margin-bottom: 16px;">📏 DBH (Diameter)</div>
+          <p style="font-size:.92rem; margin:0;">Verifikasi kelayakan tebang. Pohon di bawah ambang diameter minimum wajib dilindungi sebagai tegakan inti masa depan.</p>
+        </div>
+        <div class="compare-card" style="background: rgba(58,107,71,0.05); border-color: rgba(58,107,71,0.2);">
+          <div style="font-size: 11px; font-weight: 600; letter-spacing: .15em; text-transform: uppercase; color: var(--fern); margin-bottom: 16px;">📦 Volume (m³)</div>
+          <p style="font-size:.92rem; margin:0;">Kalkulasi target produksi dan royalti. Dasar perhitungan PNBP dan verifikasi kesesuaian produksi aktual dengan RPKH.</p>
+        </div>
+        <div class="compare-card" style="background: rgba(58,107,71,0.05); border-color: rgba(58,107,71,0.2);">
+          <div style="font-size: 11px; font-weight: 600; letter-spacing: .15em; text-transform: uppercase; color: var(--fern); margin-bottom: 16px;">🧭 Koordinat GPS</div>
+          <p style="font-size:.92rem; margin:0;">Titik geografis untuk navigasi dan pelacakan <em>(traceability)</em>. Membuktikan asal-usul kayu hingga ke pohon individual.</p>
+        </div>
+      </div>
+
+      <div class="warning-box">
+        <div class="warning-icon">⚠️</div>
+        <p><strong>Tanpa sinkronisasi data ini,</strong> produk kayu akan diklasifikasikan sebagai kayu ilegal berdasarkan standar SVLK dan regulasi impor Uni Eropa (EUDR). Akses pasar ekspor akan tertutup sepenuhnya.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 5: PENGELADA -->
+  <section class="section" id="lapangan" style="background: rgba(214,232,217,0.2);">
+    <div class="container">
+      <div class="section-label">05 · SDM Lapangan</div>
+      <h2>Pengelada: Validator Data Garis Depan</h2>
+      <p>Transformasi paling nyata terjadi pada profil pekerja lapangan. Mereka bukan sekadar penebang — mereka adalah <strong>operator data bersertifikasi (GANISPH)</strong> yang menjamin presisi eksekusi di titik yang paling kritis.</p>
+
+      <div class="cycle-grid">
+        <div class="cycle-item">
+          <div class="cycle-num">1</div>
+          <div>
+            <h3>Kompetensi Tersertifikasi</h3>
+            <p>Keahlian silvikultur, teknik pengukuran, dan K3 yang diuji dan disertifikasi oleh lembaga resmi negara.</p>
+          </div>
+        </div>
+        <div class="cycle-item">
+          <div class="cycle-num">2</div>
+          <div>
+            <h3>Mobile Tablet</h3>
+            <p>Alat input data langsung ke sistem informasi pusat. Sinkronisasi fisik-digital secara <em>real-time</em> di tengah hutan.</p>
+          </div>
+        </div>
+        <div class="cycle-item">
+          <div class="cycle-num">3</div>
+          <div>
+            <h3>Alat Ukur Presisi</h3>
+            <p>Phi-band, kaliper, dan altimeter laser untuk akurasi dimensi pohon yang tidak bisa diperdebatkan.</p>
+          </div>
+        </div>
+        <div class="cycle-item">
+          <div class="cycle-num">4</div>
+          <div>
+            <h3>GPS High-Precision</h3>
+            <p>Navigasi batas ruang mutlak dan penentuan koordinat pohon. Tidak ada ruang untuk perkiraan posisi.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 6: PADIATAPA -->
+  <section class="section">
+    <div class="container">
+      <div class="section-label">06 · Safeguard Sosial</div>
+      <h2>PADIATAPA: Membangun Benteng Kepastian Hukum</h2>
+      <p>Hutan lestari tidak beroperasi di ruang hampa. Mekanisme <strong>PADIATAPA</strong> — <em>Persetujuan Atas Dasar Informasi Awal Tanpa Paksaan</em> (Free, Prior, and Informed Consent) — adalah instrumen mitigasi risiko absolut yang melindungi semua pihak.</p>
+
+      <div class="cycle-grid">
+        <div class="cycle-item" style="border-color: rgba(30,74,43,0.25);">
+          <div class="cycle-num" style="background: var(--forest);">☑</div>
+          <div>
+            <h3>Inklusivitas</h3>
+            <p>Persetujuan masyarakat berbasis informasi transparan tanpa paksaan. Prasyarat sebelum operasi dimulai.</p>
+          </div>
+        </div>
+        <div class="cycle-item" style="border-color: rgba(30,74,43,0.25);">
+          <div class="cycle-num" style="background: var(--forest);">⚖</div>
+          <div>
+            <h3>Formalisasi Hukum</h3>
+            <p>Mengubah kesepakatan lisan menjadi instrumen mengikat: PKS, SK Bersama, atau Klausul Izin.</p>
+          </div>
+        </div>
+        <div class="cycle-item" style="border-color: rgba(30,74,43,0.25);">
+          <div class="cycle-num" style="background: var(--forest);">🛡</div>
+          <div>
+            <h3>Kekuatan Sanksi</h3>
+            <p>Memberikan legitimasi hukum perlindungan aset dari gangguan eksternal atau wanprestasi.</p>
+          </div>
+        </div>
+        <div class="cycle-item" style="border-color: rgba(30,74,43,0.25);">
+          <div class="cycle-num" style="background: var(--forest);">🔄</div>
+          <div>
+            <h3>Update Berkala</h3>
+            <p>Pembaruan periodik untuk beradaptasi dengan dinamika sosial. Bukan kesepakatan sekali-selesai.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 7: TEKNOLOGI -->
+  <section class="section" id="teknologi" style="background: rgba(214,232,217,0.2);">
+    <div class="container">
+      <div class="section-label">07 · Pengawasan Digital</div>
+      <h2>Mata di Langit: Verifikasi Tanpa Bias</h2>
+      <p>Teknologi bukan sekadar aksesoris pelaporan. Ia adalah <strong>otak kedua yang mengunci sistem</strong>, menghilangkan bias manusia, dan memvalidasi RPH secara <em>real-time</em> — 24 jam sehari, tanpa jeda.</p>
+
+      <div class="tech-grid">
+        <div class="tech-card">
+          <div class="tech-card-icon">⚡</div>
+          <h3>Kecepatan Deteksi</h3>
+          <p>Dulu penyimpangan diketahui setelah kerusakan meluas. Kini sistem AI memberi peringatan dini secara instan atas pelanggaran batas spasial.</p>
+        </div>
+        <div class="tech-card">
+          <div class="tech-card-icon">✅</div>
+          <h3>Verifikasi RPKH</h3>
+          <p>Setiap log yang dipanen tervalidasi secara digital dengan koordinat asalnya di peta spasial. Jejak audit tak terbantahkan.</p>
+        </div>
+        <div class="tech-card">
+          <div class="tech-card-icon">🔒</div>
+          <h3>Integritas Total</h3>
+          <p>Menutup peluang <em>illegal logging</em> melalui pemantauan otomatis satelit, drone, dan sensor IoT yang terintegrasi.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 8: RANTAI KARBON -->
+  <section class="section">
+    <div class="container">
+      <div class="section-label">08 · Aset Karbon</div>
+      <h2>Rantai Nilai Karbon: Dari Pohon ke Pasar Global</h2>
+      <p>Ketika semua sistem bekerja secara harmonis, hutan produksi tidak hanya menghasilkan kayu — ia menghasilkan <strong>kredit karbon yang dapat diperdagangkan</strong> di pasar global dengan standar integritas tertinggi.</p>
+
+      <div class="chain">
+        <div class="chain-item">
+          <div class="chain-item-num">🌳 FISIK</div>
+          <h3>Biomassa Pohon</h3>
+          <p>Data Species, DBH, dan Volume diekstraksi dari Database Isi Ruang.</p>
+        </div>
+        <div class="chain-item">
+          <div class="chain-item-num">🤖 DIGITAL</div>
+          <h3>Konversi AI</h3>
+          <p>Pengelada mensinkronkan data; AI mengkonversi biomassa ke estimasi potensi karbon.</p>
+        </div>
+        <div class="chain-item">
+          <div class="chain-item-num">⚖ HUKUM</div>
+          <h3>Perisai PADIATAPA</h3>
+          <p>PADIATAPA mengunci aset ini secara hukum dari klaim pihak ketiga.</p>
+        </div>
+        <div class="chain-item">
+          <div class="chain-item-num">🛰 PASAR</div>
+          <h3>Sertifikasi</h3>
+          <p>Satelit memverifikasi secara real-time bahwa area karbon utuh sesuai RPKH.</p>
+        </div>
+      </div>
+
+      <div class="pullquote">
+        <p>"Tanpa <em>Safeguard</em>, menghitung karbon hanyalah menghitung pohon sebelum mereka dicuri."</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 9: STANDAR EKSEKUSI -->
+  <section class="section" style="background: rgba(214,232,217,0.2);">
+    <div class="container">
+      <div class="section-label">09 · Standar Lapangan</div>
+      <h2>Produksi Maksimal, Kerusakan Minimal</h2>
+      <p>Dua prinsip teknis yang tidak bisa ditawar di lapangan. Keduanya bukan pilihan — keduanya adalah standar minimum yang harus dipenuhi secara bersamaan.</p>
+
+      <div class="compare-grid">
+        <div class="compare-card future">
+          <span class="compare-label">✓ DO — Wajib Dilakukan</span>
+          <div class="compare-row">
+            <h3>Penebangan Terarah (Directional Felling)</h3>
+            <p>Menjatuhkan pohon ke sudut paling aman untuk melindungi tegakan sisa — terutama pohon inti muda — dan menjaga struktur tanah. Produksi kemudian ditarik via jalur sarad yang telah dioptimalkan.</p>
+          </div>
+        </div>
+        <div class="compare-card past">
+          <span class="compare-label">✗ DON'T — Dilarang Keras</span>
+          <div class="compare-row">
+            <h3>Pelanggaran Batas RPH</h3>
+            <p>Dilarang keras melakukan aktivitas apapun satu meter pun di luar batas petak RPH. Deviasi adalah kegagalan total sistem manajerial dan <strong>pelanggaran hukum</strong> yang tidak dapat dimaafkan.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 10: MULTI-USAHA -->
+  <section class="section" id="multiusaha">
+    <div class="container">
+      <div class="section-label">10 · Diversifikasi Ekonomi</div>
+      <h2>Multi-usaha Kehutanan: Harmonisasi Ekonomi dan Ekologi</h2>
+      <p>Paradigma baru memungkinkan eksploitasi berbagai potensi ekosistem secara paralel. <strong>Satu hutan, banyak sumber nilai</strong> — selama seluruhnya tercatat dalam RPKH dan diawasi oleh sistem digital.</p>
+
+      <div class="multiuse-grid">
+        <div class="multiuse-item">
+          <div class="multiuse-item-icon">🌫️</div>
+          <h3>Potensi Karbon</h3>
+          <p>Perdagangan kredit karbon dan restorasi ekosistem — nilai dari pohon yang <em>tidak</em> ditebang.</p>
+        </div>
+        <div class="multiuse-item">
+          <div class="multiuse-item-icon">🪵</div>
+          <h3>Hasil Kayu (Timber)</h3>
+          <p>Pemanenan terukur dengan rotasi/non-rotasi berdasarkan disiplin RIL.</p>
+        </div>
+        <div class="multiuse-item">
+          <div class="multiuse-item-icon">🍯</div>
+          <h3>HHBK & Agroforestri</h3>
+          <p>Madu, getah, dan tanaman bawah tegakan bersama masyarakat sekitar hutan.</p>
+        </div>
+        <div class="multiuse-item">
+          <div class="multiuse-item-icon">🏞️</div>
+          <h3>Jasa Lingkungan</h3>
+          <p>Ekowisata di area HCV dan perlindungan tata air serta aliran sungai.</p>
+        </div>
+        <div class="multiuse-item">
+          <div class="multiuse-item-icon">🤝</div>
+          <h3>Kemitraan Masyarakat</h3>
+          <p>Hutan kemasyarakatan sebagai instrumen mitigasi konflik operasional jangka panjang.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MANIFESTO PENUTUP -->
+  <footer class="manifesto topo-bg" id="sintesis">
+    <div class="container">
+      <div class="section-label">Sintesis Arsitektur Keberlanjutan</div>
+      <p style="color:rgba(255,255,255,0.6); max-width:580px; margin: 20px auto; font-size:.98rem; line-height:1.7;">
+        Pengelolaan Hutan Lestari bukan sekadar menanam dan menebang. Ini adalah jaminan bahwa <strong style="color:#fff;">kelestarian ekologis generasi mendatang</strong> tidak akan dikorbankan demi nilai ekonomi saat ini.
+      </p>
+
+      <div class="manifesto-lines">
+        <div class="manifesto-line">
+          <span class="tag">RPKH</span>adalah Hukum di lapangan.
+        </div>
+        <div class="manifesto-line">
+          <span class="tag">Pengelola</span>adalah Eksekutornya.
+        </div>
+        <div class="manifesto-line">
+          <span class="tag">Safeguard</span>adalah Jaminannya.
+        </div>
+        <div class="manifesto-line">
+          <span class="tag">Teknologi</span>adalah Pengawasnya.
+        </div>
+      </div>
+
+      <p style="color:rgba(255,255,255,0.35); font-size:12px; letter-spacing:.1em; margin-top:48px;">
+        Bahan Kuliah Manajemen Hutan · Pengelolaan Hutan Lestari
+      </p>
+    </div>
+  </footer>
+
+  <script>
+    // Sticky nav
+    const nav = document.getElementById('mainNav');
+    window.addEventListener('scroll', () => {
+      nav.classList.toggle('scrolled', window.scrollY > 80);
+    });
+
+    // Manifesto reveal
+    const lines = document.querySelectorAll('.manifesto-line');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const idx = Array.from(lines).indexOf(entry.target);
+          setTimeout(() => entry.target.classList.add('visible'), idx * 200);
+        }
+      });
+    }, { threshold: 0.3 });
+    lines.forEach(l => observer.observe(l));
+  </script>
+</body>
+</html>
